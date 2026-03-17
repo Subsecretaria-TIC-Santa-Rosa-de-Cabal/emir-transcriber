@@ -27,6 +27,10 @@
 
         header {
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
 
         .logo {
@@ -37,7 +41,7 @@
 
         h1 {
             margin: 0;
-            font-size: 1.6em;
+            font-size: 2em;
             color: #038F67;
         }
 
@@ -85,7 +89,7 @@
 <body>
     <div class="container">
         <header>
-            <img style="width: 200px; height: auto;" src="{{ url_for('static', path='images/logo.png') }}" alt="Logo">
+            <img style="width: 100px; height: auto;" src="{{ url_for('static', path='images/logo.png') }}" alt="Logo">
             <h1>Transcriptor local</h1>
         </header>
         <form action="/transcribir/" method="post" enctype="multipart/form-data">
@@ -97,6 +101,12 @@
                 <option value="BAJA">Baja</option>
                 <option value="MEDIA" selected>Media</option>
                 <option value="ALTA">Alta</option>
+            </select>
+
+            <label for="timing">Incluir linea de tiempo:</label>
+            <select name="timing">
+                <option value="YES">Sí</option>
+                <option value="NO" selected>No</option>
             </select>
 
             <button type="submit">Transcribir</button>

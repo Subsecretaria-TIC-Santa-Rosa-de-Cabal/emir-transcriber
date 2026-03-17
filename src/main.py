@@ -13,6 +13,10 @@ class Calidad(str, Enum):
     MEDIA = "MEDIA"
     ALTA = "ALTA"
 
+class Timing(str, Enum):
+    YES = "YES"
+    NO = "NO"
+
 BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI()
@@ -30,7 +34,7 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/transcribir/")
-async def transcribir_audio(archivo: UploadFile = File(...), calidad: Calidad = Form(...)):
+async def transcribir_audio(archivo: UploadFile = File(...), calidad: Calidad = Form(...), timing: Timing = Form(...)):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
         tmp.write(await archivo.read())
         tmp_path = tmp.name
@@ -45,11 +49,13 @@ async def transcribir_audio(archivo: UploadFile = File(...), calidad: Calidad = 
     model = whisper.load_model(model_name)
     result = model.transcribe(tmp_path)
 
-    segmentos = []
-    for seg in result["segments"]:
-        segmentos.append(f"[{seg['start']:.2f} - {seg['end']:.2f}] {seg['text']}")
-
-    texto = "\n".join(segmentos)
+    if timing == Timing.YES:
+        segmentos = []
+        for seg in result["segments"]:
+            segmentos.append(f"[{seg['start']:.2f} - {seg['end']:.2f}] {seg['text']}")
+        texto = "\n".join(segmentos)
+    else:
+        texto = result["text"]
 
     base_name, _ = os.path.splitext(archivo.filename)
     txt_filename = f"{base_name}.txt"
